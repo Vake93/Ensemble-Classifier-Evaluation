@@ -1,3 +1,6 @@
+library(ggplot2)
+library(corrplot)
+
 heart<-read.csv("D:/Projects/heart.csv")
 names(heart)
 str(heart)
@@ -14,7 +17,6 @@ head(heart)
 summary(heart)
 
 # Correlation Plot
-library(corrplot)
 heart.cor = cor(heart)
 corrplot(heart.cor)
 heart.cor[14,]
@@ -29,7 +31,6 @@ chisq.test(heart$age,heart$target)
 hist(heart$age,labels=TRUE,main="Histogram of Age",xlab="Age Class",ylab="Frequency",col="purple")
 boxplot(heart$age,horizontal=TRUE,col="purple",main="Boxplot of Age")
 
-library(ggplot2)
 a <- ggplot(heart,aes(x=age,y=target)) + geom_point() + geom_smooth(color="purple",se=FALSE)
 b <- a+scale_x_continuous(name="age") + scale_y_continuous(name="target",limit=c(0,1))
 b + ggtitle("age vs target")
@@ -196,3 +197,144 @@ barplot(table(b$restecg),
         ylab="Count",
         ylim=range(pretty(c(0, table(b$restecg)))), #to adjust y-axis scale
         col=c("deepskyblue","dodgerblue4","lightslateblue"))
+
+# Maximum Heart Rate Analysis
+class(heart$thalach)
+head(heart$thalach)
+summary(heart$thalach)
+cor(heart$age,heart$thalach)
+chisq.test(heart$age,heart$thalach)
+
+boxplot(heart$thalach~as.factor(heart$sex),
+        main="Heart Rate vs Sex",
+        xlab="Sex: 0 = Female, 1 = Male",
+        ylab="Max Heart Rate",
+        col=c("purple","lightblue"))
+
+a <- ggplot(heart,aes(x=age,y=thalach))+geom_point()+geom_smooth(se=FALSE)
+b <- a+scale_x_continuous(name="Age")+scale_y_continuous(name="Maximum Heart Rate Achieved")
+b + ggtitle("Age vs Heart Rate")
+
+a <- ggplot(heart,aes(x=thalach,y=target))+geom_point()+geom_smooth(se=FALSE)
+b <- a+scale_x_continuous(name="Max Heart Rate")+scale_y_continuous(name="Prob. of Heart Attack")
+b + ggtitle("Heart rate vs Prob. Heart attack")
+
+# Exercise Induced Angina Analysis
+class(heart$exang)
+head(heart$exang)
+barplot(table(heart$exang,heart$target),
+        legend=c("Yes", "No"),
+        col=c("orangered1","palegreen2"),
+        main="Exercise Induced Angina vs Target",
+        xlab="Target",
+        ylab="Count")
+
+a <- ggplot(heart,aes(x=exang,y=target))+geom_point()+geom_smooth(color="orangered1",se=FALSE)
+b <- a + scale_x_continuous(name="Exercise Induced Angina")+scale_y_continuous(name="Target")
+b + ggtitle("Relationship Between Exang and Target")
+
+# ST Depression Induced by Exercise Relative to Rest Analysis
+class(heart$oldpeak)
+head(heart$oldpeak,20)
+summary(heart$oldpeak)
+range(heart$oldpeak)
+sd(heart$oldpeak)
+var(heart$oldpeak)
+
+colfunc <- colorRampPalette(c("green3", "red3"))
+hist(heart$oldpeak,
+     main="Histogram ST Depression",
+     xlab="ST Depression Class",
+     ylab="Frequency",
+     col=colfunc(14),
+     labels=TRUE)
+
+plot(density(heart$oldpeak),
+     main="Density plot of ST Depression",
+     xlab="ST Depression Class",
+     ylab="Density")
+polygon(density(heart$oldpeak),col="green3",border="green3")
+
+boxplot(heart$oldpeak,
+        main="ST Depression",
+        ylab="ST Depression Class",
+        col="green3")
+
+boxplot(heart$oldpeak~heart$sex,
+        main="ST Depression Female vs Male",
+        col=c("purple","lightblue"),
+        xlab="0: Feamle, 1:Male",
+        ylab="ST Depression Class")
+
+a <- ggplot(heart,aes(x=oldpeak,y=target))+geom_point()+geom_smooth(color="green3",se=FALSE)
+b <- a+scale_x_continuous(name="ST Depression Class")+scale_y_continuous(name="Prob. of Heart Attack",limit=c(0,1))
+b + ggtitle("Relation between oldpeak and heart attack")
+
+# The Slope of the Peak Exercise ST Segment Analysis
+class(heart$slope)
+head(heart$slope)
+unique(heart$slope)
+
+barplot(table(heart$slope),
+        main="ST Slope",
+        xlab="ST Slope",
+        ylab="Count",
+        col=c("darksalmon","brown1","darkred"))
+
+barplot(table(heart$slope,heart$target),
+        main="ST slope vs target",
+        col=c("darksalmon","brown1","darkred"),
+        xlab="Target",
+        ylab="Count")
+
+a <- ggplot(heart,aes(x=slope,y=target))+geom_point()+geom_smooth(color="darksalmon",se=FALSE)
+b <- a + scale_x_continuous(name="Slope")+scale_y_continuous(name="Target")
+b + ggtitle("Relationship between Slope and Target")
+
+# Number of Major Vessels Colored by Fluoroscopy Analysis
+class(heart$ca)
+unique(heart$ca)
+
+barplot(table(heart$ca),
+        main="Number of Major Vessels Colored by Fluoroscopy Analysis",
+        xlab="Number of Major Vessels Colored",
+        col=c("orangered2","orchid","palegreen3","paleturquoise3","peru"),
+        ylim=range(pretty(c(0, 170))), #to adjust y-axis scale
+        ylab="Count")
+
+barplot(table(heart$target,heart$ca),
+        main="Number of Major Vessels Colored vs Target",
+        xlab="Number of Major Vessels Colored",
+        col=c("palegreen3","orangered2"),
+        legend=c(0,1),
+        ylim=range(pretty(c(0, 170))), #to adjust y-axis scale
+        ylab="Count")
+
+a <- ggplot(heart,aes(x=ca,y=target))+geom_point()+geom_smooth(color="orangered2",se=FALSE)
+b <- a+scale_x_continuous(name="Number of Major Vessels Colored")+scale_y_continuous(name="Target")
+b + ggtitle("Relationship between No. of Major Vessels Colored and Target")
+
+# Thalium Stress Test Result Analysis
+class(heart$thal)
+unique(heart$thal)
+length(heart[heart$thal==0,]$thal)
+
+a <- heart[heart$thal!=0,]
+barplot(table(a$thal),
+        main="Thalium Stress Test Result",
+        xlab="Thalium Stress Test Result Class",
+        col=c("orangered2","orchid","palegreen3","paleturquoise3","peru"),
+        ylim=range(pretty(c(0, 170))), #to adjust y-axis scale
+        ylab="Count")
+
+barplot(table(a$target,a$thal),
+        main="Thalium Stress Test Resul vs Target",
+        xlab="Thalium Stress Test Result Class",
+        col=c("palegreen3","orangered2"),
+        legend=c(0,1),
+        ylim=range(pretty(c(0, 170))), #to adjust y-axis scale
+        ylab="Count")
+
+a <- ggplot(a,aes(x=thal,y=target))+geom_point()+geom_smooth(color="orangered2",se=FALSE)
+b <- a+scale_x_continuous(name="Thalium Stress Test Result Class")+scale_y_continuous(name="Target")
+b + ggtitle("Relationship between Thalium Stress Test Result and Target")
