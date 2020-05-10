@@ -16,11 +16,6 @@ heart <- shuffle_rows(heart)
 head(heart)
 summary(heart)
 
-# Correlation Plot
-heart.cor = cor(heart)
-corrplot(heart.cor)
-heart.cor[14,]
-
 # Age Analysis
 range(heart$age)
 summary(heart$age)
