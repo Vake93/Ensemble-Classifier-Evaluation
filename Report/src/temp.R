@@ -1,9 +1,4 @@
-library(mlbench)
-library(caret)
-library(ggplot2)
-library(corrplot)
-library(caretEnsemble)
-
+### 2nd Task: Formation of Training and Test Sets
 # Load the Data
 heart<-read.csv("D:/Projects/heart.csv")
 
@@ -44,45 +39,21 @@ testing <- heart[-intrain,]
 dim(training)
 dim(testing)
 
+### 3rd Task: Build Train and Test a Bagging type Classifier
 # Repeated CV for Bagging type classifier	
 set.seed(128)
 bagging_control <- trainControl(method="repeatedcv",number=10,repeats=3)
 
-# Repeated CV for Stacking type classifier
-set.seed(128)
-stacking_control <- trainControl(method="repeatedcv",number=10,repeats=3,savePredictions='final',classProbs=TRUE)
-
 # Random Forest
 set.seed(256)
 rf <- train(target~., data=training, method="rf", metric="Accuracy", trControl=bagging_control)
-
-# Bagged CART
-set.seed(256)
-treebag <- train(target~.,data=training,method="treebag",metric="Accuracy",trControl=bagging_control)
-
-# Summarize Results
-bagging_results <- resamples(list(treebag=treebag, rf=rf))
-summary(bagging_results)
-dotplot(bagging_results)
-
-# Stacking Algorithms
-set.seed(256)
-stacking_algorithms <- c('rpart', 'knn', 'nb')
-
-models <- caretList(target~., data=training, trControl=stacking_control, methodList=stacking_algorithms)
-results <- resamples(models)
-summary(results)
-dotplot(results)
+rf_pred<-predict(rf,newdata=testing,type='prob')
 
 
-# Testing Random Forest
-pred<-predict(rf,newdata=testing)
-confusionMatrix(data=pred,testing$target)
+rf_perf <- prediction(rf_pred$YES,testing$target)
 
-# Testing Bagged CART
-pred<-predict(treebag,newdata=testing)
-confusionMatrix(data=pred,testing$target)
+rf_perf.prec_rec <- performance(rf_perf,measure="prec",x.measure='rec')
+plot(rf_perf.prec_rec)
 
-# Testing Bagged CART
-pred<-predict(treebag,newdata=testing)
-confusionMatrix(data=pred,testing$target)
+rf_perf.acc <- performance(rf_perf,"acc")
+plot(rf_perf.acc)
