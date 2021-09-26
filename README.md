@@ -101,3 +101,6 @@ summary(heart)
 - By observing the curve, we can see that from age 30 to 60 probability of heart attack is decreasing and from 60 again probability is increasing. After 70 chance of heart attack is more.
 - Using Chi squared test we get a probability value of 0.13. There for we can conclude that target is independent of the age.
 
+![](https://github.com/Vake93/IIT.DataMiningAndMachineLearning.CW2/raw/master/Images/Histogram%20of%20Age.png)
+![](https://github.com/Vake93/IIT.DataMiningAndMachineLearning.CW2/raw/master/Images/Boxplot%20of%20Age.png)
+![](https://github.com/Vake93/IIT.DataMiningAndMachineLearning.CW2/raw/master/Images/age%20vs%20target.png)
